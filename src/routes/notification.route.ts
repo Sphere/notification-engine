@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post('/notifications', notificationController.createNotification);
 router.get('/notifications/:userid', notificationController.getUserNotifications);
-router.put('/notifications/read/:id', notificationController.markNotificationAsRead);
+router.post('/notifications/read', notificationController.markNotificationAsRead);
 
 export default router;

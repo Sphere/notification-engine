@@ -55,9 +55,9 @@ export const getUserNotifications = async (req: Request, res: Response): Promise
 // Mark a notification as read
 export const markNotificationAsRead = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
-        if (!id) {
-            res.status(400).json({ error: 'Notification ID is required' });
+        const { id,userId } = req.body;
+        if (!id||!userId) {
+            res.status(400).json({ error: 'Notification ID or User ID is required' });
             return;
         }
         await notificationService.markAsRead(id);

@@ -50,7 +50,7 @@ export const getNotifications = async (userId: string) => {
   const query = `
     SELECT *
     FROM user_notifications
-    WHERE userid = ? ALLOW FILTERING
+    WHERE userid = ? AND status = 'unread' ALLOW FILTERING
   `;
   const result = await client.execute(query, [userId], { prepare: true });
   return result.rows;
@@ -61,7 +61,7 @@ export const markAsRead = async (notificationId: string) => {
   const query = `
     UPDATE user_notifications
     SET status = 'read'
-    WHERE notification_id = ?
+    WHERE  id = ?;
   `;
   await client.execute(query, [notificationId], { prepare: true });
 };

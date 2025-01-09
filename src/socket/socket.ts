@@ -7,7 +7,7 @@ const setupSocket = (io: Server) => {
     console.log(`User connected: ${socket.id}`);
 
     // Mark notification as read
-    socket.on('markAsRead', async (data: { userId: string; notificationId: string }) => {
+    socket.on('markAsRead', async (data: { notificationId: string }) => {
       try {
         logger.info('Marking notification as read triggered');
         await markAsRead(data.notificationId);
