@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { markAsRead } from '../services/notification.service';
+import { logger } from '../utils/logger';
 
 const setupSocket = (io: Server) => {
   io.on('connection', (socket: Socket) => {
@@ -8,6 +9,7 @@ const setupSocket = (io: Server) => {
     // Mark notification as read
     socket.on('markAsRead', async (data: { userId: string; notificationId: string }) => {
       try {
+        logger.info('Marking notification as read triggered');
         await markAsRead(data.notificationId);
         socket.emit('readConfirmation', { notificationId: data.notificationId });
       } catch (error) {
