@@ -67,13 +67,12 @@ export const markAsRead = async (notificationId: string) => {
     await client.execute(query, [notificationId], { prepare: true });
 }
 export const markAllAsRead = async (userId: string) => {
-    const query = `
-    UPDATE user_notifications
-    SET status = 'read' 
-    WHERE  userid = ?;
-  `;
-
-    await client.execute(query, [userId], { prepare: true });
+    const getAllUnreadNotifications = await getNotifications(userId);
+    const batchQueries = getAllUnreadNotifications.map((notification) => ({
+        query: 'UPDATE user_notifications SET status = ? WHERE id = ?;',
+        params: ['read', notification.id],
+    }));
+    await client.batch(batchQueries, { prepare: true })
 }
 function uuidv4() {
     throw new Error('Function not implemented.');
