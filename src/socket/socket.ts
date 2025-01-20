@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import { markAsRead, getNotificationCount } from '../services/notification.service';
+import { markAsRead, getNotificationCount,markAllAsRead } from '../services/notification.service';
 import { logger } from '../utils/logger';
 
 const setupSocket = (io: Server) => {
@@ -7,11 +7,20 @@ const setupSocket = (io: Server) => {
         console.log(`User connected: ${socket.id}`);
 
         // Mark notification as read
-        socket.on('markAsRead', async (data: { notificationIds: string[] }) => {
+        socket.on('markAsRead', async (data: { notificationId: string }) => {
             try {
                 logger.info('Marking notification as read triggered');
-                await markAsRead(data.notificationIds);
-                socket.emit('readConfirmation', { notificationIds: data.notificationIds });
+                await markAsRead(data.notificationId);
+                socket.emit('readConfirmation', { notificationIds: data.notificationId });
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        });
+        socket.on('markAllAsRead', async (data: { userId: string }) => {
+            try {
+                logger.info('Marking all notification as read triggered');
+                await markAllAsRead(data.userId);
+                socket.emit('readConfirmation', { notificationIds: data.userId });
             } catch (error) {
                 console.error('Error marking notification as read:', error);
             }
