@@ -41,7 +41,7 @@ export const createNotification = async (newNotification: any, io: Server) => {
 
 };
 export const getNotificationCount = async (userid: String) => {
-    const query = 'SELECT COUNT(*) FROM user_notifications WHERE userid = ? AND status = ? ALLOW FILTERING;';
+    const query = 'SELECT COUNT(*) FROM user_notifications WHERE userid = ? AND status = ?;';
     const result = await client.execute(query, [userid, "unread"], { prepare: true });
     return result.rows[0].count || 0;
 };
@@ -50,27 +50,27 @@ export const getNotifications = async (userId: string) => {
     const query = `
     SELECT *
     FROM user_notifications
-    WHERE userid = ? AND status = 'unread' ALLOW FILTERING
+    WHERE userid = ? AND status = 'unread' LIMIT 20
   `;
     const result = await client.execute(query, [userId], { prepare: true });
     return result.rows;
 };
 
 // Mark a notification as read
-export const markAsRead = async (notificationId: string) => {
+export const markAsRead = async (notificationId: string,userId: string) => {
     const query = `
     UPDATE user_notifications
     SET status = 'read' 
-    WHERE  id = ?;
+    WHERE  id = ? AND userid = ?;
   `;
 
-    await client.execute(query, [notificationId], { prepare: true });
+    await client.execute(query, [notificationId,userId], { prepare: true });
 }
 export const markAllAsRead = async (userId: string) => {
     const getAllUnreadNotifications = await getNotifications(userId);
     const batchQueries = getAllUnreadNotifications.map((notification) => ({
-        query: 'UPDATE user_notifications SET status = ? WHERE id = ?;',
-        params: ['read', notification.id],
+        query: 'UPDATE user_notifications SET status = ? WHERE id = ? AND userid = ?;',
+        params: ['read', notification.id,userId],
     }));
     await client.batch(batchQueries, { prepare: true })
 }

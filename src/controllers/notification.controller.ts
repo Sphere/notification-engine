@@ -31,6 +31,7 @@ export const createNotification = async (req: Request, res: Response): Promise<v
         await notificationService.createNotification(newNotification, io);
         res.status(201).json({ message: 'Notification created successfully', id: newNotification.id });
     } catch (error) {
+        console.log(error)
         logger.info('Error creating notification:', error);
         res.status(500).json({ error: 'Failed to create notification' });
     }
@@ -60,7 +61,21 @@ export const markNotificationAsRead = async (req: Request, res: Response): Promi
             res.status(400).json({ error: 'Notification ID or User ID is required' });
             return;
         }
-        await notificationService.markAsRead(id);
+        await notificationService.markAsRead(id,userId);
+        res.status(200).json({ message: 'Notification marked as read' });
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+        res.status(500).json({ error: 'Failed to mark notification as read' });
+    }
+};
+export const markAllNotificationAsRead = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId } = req.body;
+        if (!userId) {
+            res.status(400).json({ error: 'User ID is required' });
+            return;
+        }
+        await notificationService.markAllAsRead(userId);
         res.status(200).json({ message: 'Notification marked as read' });
     } catch (error) {
         console.error('Error marking notification as read:', error);
