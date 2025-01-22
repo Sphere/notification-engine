@@ -32,7 +32,7 @@ app.use((req, _res, next) => {
 app.use(attachIo(io));
 app.use(cors());
 app.use(express.json());
-app.use('/notifications', notificationRoutes);
+app.use('/v1', notificationRoutes);
 setupSocket(io);
 
 httpServer.listen(applicationPort, () => {
