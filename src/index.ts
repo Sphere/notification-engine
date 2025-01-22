@@ -4,7 +4,7 @@ import cors from 'cors';
 import notificationRoutes from './routes/notification.route';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import { setupSocket } from './socket/socket';  // Your socket setup
+import { setupSocket } from './socket/socket';  
 import { logger } from "./utils/logger";
 
 const applicationPort= process.env.APPLICATION_PORT || "3013"
@@ -20,8 +20,8 @@ const io = new Server(httpServer, {
 
 export const attachIo = (io: Server) => {
     return (req: any, res: any, next: any) => {
-        req.io = io;  // Attach io instance to req
-        next();        // Continue to the next middleware or route handler
+        req.io = io;  
+        next();  
     };
 };
 
@@ -36,6 +36,6 @@ app.use('/v1', notificationRoutes);
 setupSocket(io);
 
 httpServer.listen(applicationPort, () => {
-    console.log(`Server running at http://localhost:${applicationPort}`);
+    console.log(`Server running at port ${applicationPort}`);
 });
 export default app;

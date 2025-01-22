@@ -11,7 +11,7 @@ export const createNotification = async (newNotification: any, io: Server) => {
     `;
 
     const {
-        id = uuidv4(), // Generate unique UUID if not provided
+        id = uuidv4(),
         userid,
         category,
         createdby,
@@ -19,7 +19,7 @@ export const createNotification = async (newNotification: any, io: Server) => {
         data,
         expireon,
         priority,
-        status = 'unread', // Default status is 'unread'
+        status = 'unread', 
         updatedby,
         updatedon,
     } = newNotification;
@@ -37,14 +37,10 @@ export const createNotification = async (newNotification: any, io: Server) => {
         updatedby,
         updatedon,
     ], { prepare: true });
-    io.emit('notificationCountUpdated', { userid, count: await getNotificationCount(userid) });
+    io.emit('newNotification', { userid, notificationData: await getNotifications(userid)});
 
 };
-export const getNotificationCount = async (userid: String) => {
-    const query = 'SELECT COUNT(*) FROM user_notifications WHERE userid = ? AND status = ?;';
-    const result = await client.execute(query, [userid, "unread"], { prepare: true });
-    return result.rows[0].count || 0;
-};
+
 // Get notifications for a user
 export const getNotifications = async (userId: string) => {
     const query = `
