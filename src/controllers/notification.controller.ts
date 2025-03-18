@@ -5,31 +5,35 @@ import { logger } from '../utils/logger';
 export const createNotification = async (req: Request, res: Response): Promise<void> => {
     try {
         const io = req.io;
-        const {
-            userid,
-            category,
-            createdby,
-            data,
-            expireon,
-            priority,
-        } = req.body;
-
-        const newNotification = {
-            id: require('uuid').v4(),
-            userid,
-            category,
-            createdby,
-            createdon: new Date(),
-            data: JSON.stringify(data),
-            expireon: expireon ? new Date(expireon) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default expiry: 7 days
-            priority,
-            status: 'unread',
-            updatedby: createdby,
-            updatedon: new Date(),
-        };
-        logger.info(newNotification);
-        await notificationService.createNotification(newNotification, io);
-        res.status(201).json({ message: 'Notification created successfully', id: newNotification.id });
+        const userList = req.body
+        const notificationsIdList=[]
+        for (const user of userList) {
+            const {
+                userid,
+                category,
+                createdby,
+                data,
+                expireon,
+                priority,
+            } = user
+            const newNotification = {
+                id: require('uuid').v4(),
+                userid,
+                category,
+                createdby,
+                createdon: new Date(),
+                data: JSON.stringify(data),
+                expireon: expireon ? new Date(expireon) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default expiry: 7 days
+                priority,
+                status: 'unread',
+                updatedby: createdby,
+                updatedon: new Date(),
+            };
+            notificationsIdList.push(newNotification.id)
+            logger.info(newNotification);
+            await notificationService.createNotification(newNotification, io);
+        }
+        res.status(201).json({ message: 'Notification created successfully', ids: notificationsIdList });
     } catch (error) {
         console.log(error)
         logger.info('Error creating notification:', error);
@@ -56,12 +60,12 @@ export const getUserNotifications = async (req: Request, res: Response): Promise
 // Mark a notification as read
 export const markNotificationAsRead = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id,userId } = req.body;
-        if (!id||!userId) {
+        const { id, userId } = req.body;
+        if (!id || !userId) {
             res.status(400).json({ error: 'Notification ID or User ID is required' });
             return;
         }
-        await notificationService.markAsRead(id,userId);
+        await notificationService.markAsRead(id, userId);
         res.status(200).json({ message: 'Notification marked as read' });
     } catch (error) {
         console.error('Error marking notification as read:', error);
